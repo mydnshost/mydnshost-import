@@ -21,7 +21,7 @@
 
 			if (!isset($domains[$domain])) {
 				echo 'Creating Domain: ', $domain;
-				$result = $api->createDomain($domain, $config['newOwner']);
+				$result = $config['isAdmin'] ? $api->createDomain($domain, $config['newOwner']) : $api->createDomain($domain);
 				if (isset($result['error'])) {
 					$errors[$domain] = 'Unable to create: ' . $result['error'];
 					if (isset($result['errorData'])) {
