@@ -3,7 +3,7 @@
 	$config['api'] = 'https://api.mydnshost.co.uk/';
 
 	// Username to run as
-	$config['user'] = 'admin@example.org.uk';
+	$config['user'] = 'admin@example.org';
 
 	// API Key to use to connect
 	$config['apikey'] = 'AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE';
