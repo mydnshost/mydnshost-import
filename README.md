@@ -5,7 +5,7 @@ This repository contains code to take a directory of zone files and bulk-import 
 ## Usage:
 
 - Clone the repo
-  - Update submodules with `git submodule update --init`
+- Grab dependencies via composer `composer update`
 - Create config.local.php with your user and API key:
 ```php
 	$config['user'] = 'admin@example.org.uk';

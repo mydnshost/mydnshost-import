@@ -1,0 +1,17 @@
+{
+    "name": "mydnshost/mydnshost-import",
+    "description": "mydnshost.co.uk bulk zone import",
+    "homepage": "https://github.com/mydnshost/mydnshost-import",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Shane Mc Cormack",
+            "email": "shanemcc@gmail.com",
+            "homepage": "http://www.dataforce.org.uk/"
+        }
+    ],
+    "require": {
+        "mydnshost/mydnshost-php-api": "0.1"
+    }
+}
+

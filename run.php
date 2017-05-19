@@ -1,9 +1,7 @@
 #!/usr/bin/env php
 <?php
+	require_once(__DIR__ . '/vendor/autoload.php');
 	require_once(__DIR__ . '/bind.php');
-	require_once(__DIR__ . '/MyDNSHostAPI.php');
-	require_once(__DIR__ . '/requests/library/Requests.php');
-	Requests::register_autoloader();
 	require_once(__DIR__ . '/config.php');
 
 	$api = new MyDNSHostAPI($config['api']);
