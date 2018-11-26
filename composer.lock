@@ -1,28 +1,27 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "hash": "b5be293b1afaaa498d8cd72c894373fb",
-    "content-hash": "e2ae490264a8f2f252fc1486211a4687",
+    "content-hash": "2f0818a363d2fdf1c4116de7c30287fd",
     "packages": [
         {
             "name": "mydnshost/mydnshost-php-api",
-            "version": "0.1",
+            "version": "0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mydnshost/mydnshost-php-api.git",
-                "reference": "a6e13764c8fa98fd21cc57530c847c2f21ce0bd2"
+                "reference": "36f137bb3c12e36e5e79aeb8289cc3b26413e5e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mydnshost/mydnshost-php-api/zipball/a6e13764c8fa98fd21cc57530c847c2f21ce0bd2",
-                "reference": "a6e13764c8fa98fd21cc57530c847c2f21ce0bd2",
+                "url": "https://api.github.com/repos/mydnshost/mydnshost-php-api/zipball/36f137bb3c12e36e5e79aeb8289cc3b26413e5e9",
+                "reference": "36f137bb3c12e36e5e79aeb8289cc3b26413e5e9",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0",
+                "php": ">=7.1",
                 "rmccue/requests": "^1.7"
             },
             "type": "library",
@@ -44,7 +43,7 @@
             ],
             "description": "PHP API for mydnshost.co.uk",
             "homepage": "https://github.com/mydnshost/mydnshost-php-api",
-            "time": "2017-05-19 21:27:13"
+            "time": "2017-11-26T18:06:54+00:00"
         },
         {
             "name": "rmccue/requests",
@@ -93,7 +92,7 @@
                 "iri",
                 "sockets"
             ],
-            "time": "2016-10-13 00:11:37"
+            "time": "2016-10-13T00:11:37+00:00"
         }
     ],
     "packages-dev": [],
