@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "be902aae4dd5eb0d24266a13ce501de7",
+    "content-hash": "6b71a36f2bb7825b4c5c18fa79bc7773",
     "packages": [
         {
             "name": "mydnshost/mydnshost-php-api",
-            "version": "0.5.1",
+            "version": "0.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mydnshost/mydnshost-php-api.git",
-                "reference": "e4b45c936587f0fa5616f77901b52a93e0dd8453"
+                "reference": "687ad9c2e3b6001a142dea8fe7dc19a61f841e6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mydnshost/mydnshost-php-api/zipball/e4b45c936587f0fa5616f77901b52a93e0dd8453",
-                "reference": "e4b45c936587f0fa5616f77901b52a93e0dd8453",
+                "url": "https://api.github.com/repos/mydnshost/mydnshost-php-api/zipball/687ad9c2e3b6001a142dea8fe7dc19a61f841e6a",
+                "reference": "687ad9c2e3b6001a142dea8fe7dc19a61f841e6a",
                 "shasum": ""
             },
             "require": {
@@ -43,7 +43,7 @@
             ],
             "description": "PHP API for mydnshost.co.uk",
             "homepage": "https://github.com/mydnshost/mydnshost-php-api",
-            "time": "2019-07-13T19:36:35+00:00"
+            "time": "2019-10-13T00:56:59+00:00"
         },
         {
             "name": "rmccue/requests",
