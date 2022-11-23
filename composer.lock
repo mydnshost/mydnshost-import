@@ -4,25 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "437ba6f13904c99f23fc9656b9f7d1ea",
+    "content-hash": "2b69b7b0988f868542f5e6eb36e6248b",
     "packages": [
         {
             "name": "mydnshost/mydnshost-php-api",
-            "version": "0.5.3",
+            "version": "0.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mydnshost/mydnshost-php-api.git",
-                "reference": "392e17d6f921a1406f6d5f3706c9d03dabac9ec1"
+                "reference": "398e96c475fad424c574b0253d9f23bb808211d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mydnshost/mydnshost-php-api/zipball/392e17d6f921a1406f6d5f3706c9d03dabac9ec1",
-                "reference": "392e17d6f921a1406f6d5f3706c9d03dabac9ec1",
+                "url": "https://api.github.com/repos/mydnshost/mydnshost-php-api/zipball/398e96c475fad424c574b0253d9f23bb808211d1",
+                "reference": "398e96c475fad424c574b0253d9f23bb808211d1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1",
-                "rmccue/requests": "^1.7"
+                "rmccue/requests": "^2.0"
             },
             "type": "library",
             "autoload": {
@@ -45,42 +45,50 @@
             "homepage": "https://github.com/mydnshost/mydnshost-php-api",
             "support": {
                 "issues": "https://github.com/mydnshost/mydnshost-php-api/issues",
-                "source": "https://github.com/mydnshost/mydnshost-php-api/tree/0.5.3"
+                "source": "https://github.com/mydnshost/mydnshost-php-api/tree/0.5.5"
             },
-            "time": "2021-04-28T10:25:04+00:00"
+            "time": "2022-11-22T07:13:36+00:00"
         },
         {
             "name": "rmccue/requests",
-            "version": "v1.8.0",
+            "version": "v2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress/Requests.git",
-                "reference": "afbe4790e4def03581c4a0963a1e8aa01f6030f1"
+                "reference": "b717f1d2f4ef7992ec0c127747ed8b7e170c2f49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress/Requests/zipball/afbe4790e4def03581c4a0963a1e8aa01f6030f1",
-                "reference": "afbe4790e4def03581c4a0963a1e8aa01f6030f1",
+                "url": "https://api.github.com/repos/WordPress/Requests/zipball/b717f1d2f4ef7992ec0c127747ed8b7e170c2f49",
+                "reference": "b717f1d2f4ef7992ec0c127747ed8b7e170c2f49",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2"
+                "ext-json": "*",
+                "php": ">=5.6"
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
                 "php-parallel-lint/php-console-highlighter": "^0.5.0",
-                "php-parallel-lint/php-parallel-lint": "^1.3",
+                "php-parallel-lint/php-parallel-lint": "^1.3.1",
                 "phpcompatibility/php-compatibility": "^9.0",
-                "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5 || ^7.5",
-                "requests/test-server": "dev-master",
-                "squizlabs/php_codesniffer": "^3.5",
-                "wp-coding-standards/wpcs": "^2.0"
+                "requests/test-server": "dev-main",
+                "roave/security-advisories": "dev-latest",
+                "squizlabs/php_codesniffer": "^3.6",
+                "wp-coding-standards/wpcs": "^2.0",
+                "yoast/phpunit-polyfills": "^1.0.0"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "Requests": "library/"
-                }
+                "files": [
+                    "library/Deprecated.php"
+                ],
+                "psr-4": {
+                    "WpOrg\\Requests\\": "src/"
+                },
+                "classmap": [
+                    "library/Requests.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -89,11 +97,23 @@
             "authors": [
                 {
                     "name": "Ryan McCue",
-                    "homepage": "http://ryanmccue.info"
+                    "homepage": "https://rmccue.io/"
+                },
+                {
+                    "name": "Alain Schlesser",
+                    "homepage": "https://github.com/schlessera"
+                },
+                {
+                    "name": "Juliette Reinders Folmer",
+                    "homepage": "https://github.com/jrfnl"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/WordPress/Requests/graphs/contributors"
                 }
             ],
             "description": "A HTTP library written in PHP, for human beings.",
-            "homepage": "http://github.com/WordPress/Requests",
+            "homepage": "https://requests.ryanmccue.info/",
             "keywords": [
                 "curl",
                 "fsockopen",
@@ -104,10 +124,11 @@
                 "sockets"
             ],
             "support": {
+                "docs": "https://requests.ryanmccue.info/",
                 "issues": "https://github.com/WordPress/Requests/issues",
-                "source": "https://github.com/WordPress/Requests/tree/v1.8.0"
+                "source": "https://github.com/WordPress/Requests"
             },
-            "time": "2021-04-27T11:05:25+00:00"
+            "time": "2022-10-11T08:15:28+00:00"
         }
     ],
     "packages-dev": [],
@@ -118,5 +139,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.3.0"
 }

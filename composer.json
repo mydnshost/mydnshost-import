@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "mydnshost/mydnshost-php-api": "0.5.3"
+        "mydnshost/mydnshost-php-api": "0.5.5"
     }
 }
 
