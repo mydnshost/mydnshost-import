@@ -10,19 +10,85 @@
 	$api->domainAdmin($config['isAdmin']);
 
 	$domains = $api->getDomains();
-
 	$errors = [];
 
-	$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($config['zones'], RecursiveDirectoryIterator::SKIP_DOTS));
-	foreach ($it as $file) {
-		if (pathinfo($file, PATHINFO_EXTENSION) == "db" || pathinfo($file, PATHINFO_EXTENSION) == "zone") {
-			$domain = pathinfo($file, PATHINFO_FILENAME);
+	if (!is_array($config['zones'])) { $config['zones'] = [$config['zones']]; }
 
-			if (!isset($domains[$domain])) {
-				echo 'Creating Domain: ', $domain;
-				$result = $config['isAdmin'] ? $api->createDomain($domain, $config['newOwner']) : $api->createDomain($domain);
+	foreach ($config['zones'] as $zoneDir) {
+		$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($zoneDir, RecursiveDirectoryIterator::SKIP_DOTS));
+		foreach ($it as $file) {
+			if (pathinfo($file, PATHINFO_EXTENSION) == "db" || pathinfo($file, PATHINFO_EXTENSION) == "zone") {
+				$domain = pathinfo($file, PATHINFO_FILENAME);
+
+				$wantedOwner = $config['newOwner'];
+				if (isset($config['newOwnerOverride'][$zoneDir])) { $wantedOwner = $config['newOwnerOverride'][$zoneDir]; }
+				if (isset($config['newOwnerOverride'][$domain])) { $wantedOwner = $config['newOwnerOverride'][$domain]; }
+
+				if (!isset($domains[$domain])) {
+					echo 'Creating Domain: ', $domain;
+					$result = $config['isAdmin'] ? $api->createDomain($domain, $wantedOwner) : $api->createDomain($domain);
+					if (isset($result['error'])) {
+						$errors[$domain] = 'Unable to create: ' . $result['error'];
+						if (isset($result['errorData'])) {
+							$errors[$domain] .= ' :: ' . $result['errorData'];
+						}
+						echo ' - Error!', "\n";
+						continue;
+					} else {
+						echo ' - Success!', "\n";
+					}
+				} else {
+					if ($config['isAdmin']) {
+						// Check if domain has $wantedOwner as an owner, if not, abort.
+						$wantedOwnerLevel = $domains[$domain]['users'][$wantedOwner] ?? 'none';
+						if ($wantedOwnerLevel != 'owner') {
+							echo 'Domain exists with wrong owner: ', $domain, ' wanted: ', $wantedOwner, ' - Skipping!', "\n";
+							continue;
+						}
+					}
+				}
+
+				echo 'Importing Domain: ', $domain;
+				$bind = new Bind($domain, '', $file);
+				$bind->parseZoneFile();
+
+				$changed = false;
+
+				// Check if NAMESERVERS need changing.
+				$domainInfo = $bind->getDomainInfo();
+				$oldNS = [];
+				if (isset($domainInfo['NS'])) {
+					foreach ($domainInfo['NS'][''] as $r) {
+						$oldNS[] = $r['Address'];
+					}
+				}
+
+				if (count(array_diff($oldNS, $config['nameservers'])) > 0 || count(array_diff($config['nameservers'], $oldNS)) > 0) {
+					$changed = true;
+					$bind->unsetRecord('', 'NS');
+					foreach ($config['nameservers'] as $ns) {
+						$bind->setRecord('@', 'NS', $ns);
+					}
+				}
+
+				$soa = $bind->getSOA();
+				if ($soa['Nameserver'] != $config['nameservers'][0]) {
+					$soa['Nameserver'] = $config['nameservers'][0];
+					$changed = true;
+				}
+
+				if ($changed) {
+					$soa['Serial'] = $bind->getNextSerial();
+					$bind->setSOA($soa);
+
+					echo ' (Zone has been changed.)';
+				}
+
+				$zonedata = implode("\n", $bind->getParsedZoneFile());
+
+				$result = $api->importZone($domain, $zonedata);
 				if (isset($result['error'])) {
-					$errors[$domain] = 'Unable to create: ' . $result['error'];
+					$errors[$domain] = 'Unable to import: ' . $result['error'];
 					if (isset($result['errorData'])) {
 						$errors[$domain] .= ' :: ' . $result['errorData'];
 					}
@@ -31,54 +97,6 @@
 				} else {
 					echo ' - Success!', "\n";
 				}
-			}
-
-			echo 'Importing Domain: ', $domain;
-			$bind = new Bind($domain, '', $file);
-			$bind->parseZoneFile();
-
-			$changed = false;
-
-			// Check if NAMESERVERS need changing.
-			$domainInfo = $bind->getDomainInfo();
-			$oldNS = [];
-			foreach ($domainInfo['NS'][''] as $r) {
-				$oldNS[] = $r['Address'];
-			}
-
-			if (count(array_diff($oldNS, $config['nameservers'])) > 0 || count(array_diff($config['nameservers'], $oldNS)) > 0) {
-				$changed = true;
-				$bind->unsetRecord('', 'NS');
-				foreach ($config['nameservers'] as $ns) {
-					$bind->setRecord('', 'NS', $ns);
-				}
-			}
-
-			$soa = $bind->getSOA();
-			if ($soa['Nameserver'] != $config['nameservers'][0]) {
-				$soa['Nameserver'] = $config['nameservers'][0];
-				$changed = true;
-			}
-
-			if ($changed) {
-				$soa['Serial'] = $bind->getNextSerial();
-				$bind->setSOA($soa);
-
-				echo ' (Zone has been changed.)';
-			}
-
-			$zonedata = implode("\n", $bind->getParsedZoneFile());
-
-			$result = $api->importZone($domain, $zonedata);
-			if (isset($result['error'])) {
-				$errors[$domain] = 'Unable to import: ' . $result['error'];
-				if (isset($result['errorData'])) {
-					$errors[$domain] .= ' :: ' . $result['errorData'];
-				}
-				echo ' - Error!', "\n";
-				continue;
-			} else {
-				echo ' - Success!', "\n";
 			}
 		}
 	}
