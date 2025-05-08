@@ -1,5 +1,13 @@
 <?php
 
+	function do_idn_to_ascii($domain) {
+		return ($domain == '.') ? $domain : idn_to_ascii($domain, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
+	}
+
+	function do_idn_to_utf8($domain) {
+		return ($domain == '.') ? $domain : idn_to_utf8($domain, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
+	}
+
 	/**
 	 * This class allows for manipulating bind zone files.
 	 */
@@ -55,7 +63,7 @@
 		 * @param $file (optional) File to load domain info from
 		 */
 		function __construct($domain, $zonedirectory, $file = '') {
-			$domain = idn_to_ascii($domain);
+			$domain = do_idn_to_ascii($domain);
 			$this->domain = $domain;
 			$this->zonedirectory = $zonedirectory;
 			if ($file == '' || !file_exists($file) || !is_file($file) || !is_readable($file)) {
@@ -124,37 +132,44 @@
 		 */
 		function parseZoneFile() {
 			$file = $this->getZoneFileContents();
-			$ttl = '2d';
+			$zonettl = $this->ttlToInt('2d');
 			$origin = $this->domain.'.';
 			$startname = $origin;
 
 			$domainInfo = $this->domainInfo;
+			$lastComment = [];
 			for ($i = 0; $i < count($file); $i++) {
 				$testline = trim($file[$i]);
-				if (empty($testline) || $testline{0} == ';' || $testline == ')') { continue; }
+				if (empty($testline) || $testline == ')') { continue; }
+				if ($testline[0] == ';') {
+					$lastComment[] = ltrim($testline, '; ');
+					continue;
+				}
 				$line = rtrim($file[$i]);
 
 				$pos = 0;
 
 				$bits = preg_split('/\s+/', $line);
 				if (strtolower($bits[0]) == '$ttl') {
-					$ttl = $bits[++$pos];
-					$this->debug('parseZoneFile', 'TTL is now: '.$ttl);
-					if (!isset($domainInfo[' META ']['TTL'])) { $domainInfo[' META ']['TTL'] = $ttl; }
+					$zonettl = $this->ttlToInt($bits[++$pos]);
+					$this->debug('parseZoneFile', 'TTL is now: '.$zonettl);
+					if (!isset($domainInfo[' META ']['TTL'])) { $domainInfo[' META ']['TTL'] = $zonettl; }
+					$lastComment = [];
 				} else if (strtolower($bits[0]) == '$origin') {
 					$origin = $bits[++$pos];
 					$this->debug('parseZoneFile', 'Origin is now: '.$origin);
 					if ($origin == '.') { $origin = ''; }
+					$lastComment = [];
 				} else {
 					// Zone stuff!
 					$pos = 0;
-					$thisttl = $ttl;
+					$thisttl = $zonettl;
 
 					$name = $bits[0];
 
 					for ($pos = 1; $pos < count($bits); $pos++) {
 						if (is_numeric($bits[$pos])) {
-							$ttl = $bits[$pos];
+							$thisttl = $this->ttlToInt($bits[$pos]);
 						} else if (strtoupper($bits[$pos]) == 'IN') {
 							continue;
 						} else {
@@ -179,9 +194,9 @@
 					$end = substr($name, strlen($name) - $len);
 
 					if ($type == 'SOA') {
-						if ($name == $origin) {
+						// if ($name == $origin) {
 							$name = $this->domain . '.';
-						}
+						// }
 					} else {
 						if ($end == $this->domain.'.') {
 							if ($name != $end) {
@@ -220,7 +235,7 @@
 									$line = trim($file[++$i]);
 									$bits = preg_split('/\s+/', $line);
 									foreach ($bits as $bit) {
-										if (trim($bit) == '' || $bit{0} == ';') { break; }
+										if (trim($bit) == '' || $bit[0] == ';') { break; }
 										$soabits[] = $bit;
 									}
 								} else {
@@ -235,6 +250,8 @@
 							break;
 						case 'MX':
 						case 'SRV':
+						case 'HTTPS':
+						case 'SVCB':
 							$info['Priority'] = $bits[$pos++];
 							// Fall through
 						default:
@@ -246,7 +263,13 @@
 							break;
 					}
 
-					if (!isset($domainInfo[' META ']['TTL'])) { $domainInfo[' META ']['TTL'] = $ttl; }
+					if (!isset($domainInfo[' META ']['TTL'])) { $domainInfo[' META ']['TTL'] = $thisttl; }
+
+					// If a TXT record is given, parse it to a single string rather than multiple.
+					if ($type == 'TXT') { $info['Address'] = Bind::parseTXTRecord($info['Address']); }
+
+					$info['Comment'] = $lastComment;
+					$lastComment = [];
 
 					// And finally actually add to the domainInfo array:
 					$domainInfo[$type][$name][] = $info;
@@ -261,6 +284,58 @@
 					$this->debug('parseZoneFile', $line);
 				}
 			}
+		}
+
+		/**
+		 * Parse a TXT Record into an unquoted string.
+		 *
+		 * @param $input Input string to use as txt record.
+		 * @return Single-String version of input, without quotes.
+		 */
+		public static function parseTXTRecord($input) {
+			// If there are no spaces and no quotes, then just use input as-is.
+			if (preg_match('#^[^\s"]+$#', $input, $m)) { return $input; }
+			// TODO:  I think I'm technically wrong still here, as I'll still
+			//        require a string to be quoted if you want to put a " in
+			//        it somewhere. Currently the input: foo"bar will fall
+			//        through to below which will match it as "bar"
+
+			$last = '';
+			$output = '';
+			$inQuote = false;
+			for ($i = 0; $i < strlen($input); $i++) {
+				$c = $input[$i];
+				if ($c == '"' && $last != '\\') { $inQuote = !$inQuote; }
+				else if ($inQuote) {
+					if ($c == '"' && $last == '\\') { $output = substr($output, 0, -1); }
+					$output .= $c;
+				}
+				$last = $c;
+			}
+
+			return $output;
+		}
+
+		/**
+		 * Convert a string to a TXT record, splitting it if needed and escaping
+		 * any instances of " within the string.
+		 *
+		 * @param $input Input string to use as txt record.
+		 * @return Multi-String version of input, surrounded by quotes.
+		 */
+		public static function stringToTXTRecord($input) {
+			$bits = [];
+			$current = '';
+			for ($i = 0; $i < strlen($input); $i++) {
+				$c = $input[$i];
+				if ($c == '"') { $current .= '\\'; }
+				$current .= $c;
+
+				if (strlen($current) >= 250) { $bits[] = $current; $current = ''; }
+			}
+			$bits[] = $current;
+
+			return '"' . implode('" "', $bits) . '"';
 		}
 
 		/**
@@ -314,8 +389,8 @@
 		 * @param $soa The SOA record for this domain.
 		 */
 		function setSOA($soa) {
-			$soa['Nameserver'] = idn_to_ascii(substr($soa['Nameserver'], -1) == '.' ? substr($soa['Nameserver'], 0, -1) : $soa['Nameserver']) . '.';
-			$soa['Email'] = idn_to_ascii(substr($soa['Email'], -1) == '.' ? substr($soa['Email'], 0, -1) : $soa['Email']) . '.';
+			$soa['Nameserver'] = do_idn_to_ascii(substr($soa['Nameserver'], -1) == '.' ? substr($soa['Nameserver'], 0, -1) : $soa['Nameserver']) . '.';
+			$soa['Email'] = do_idn_to_ascii(substr($soa['Email'], -1) == '.' ? substr($soa['Email'], 0, -1) : $soa['Email']) . '.';
 			$this->domainInfo['SOA'][$this->domain.'.'][0] = $soa;
 		}
 
@@ -346,21 +421,25 @@
 		 * @param $data The data for the record (ie 127.0.0.1)
 		 * @param $ttl (optional) TTL for the record.
 		 * @param $priority (optional) Priority of the record (for mx)
+		 * @param $comment (optional) Comment to put above this record
 		 */
-		function setRecord($name, $type, $data, $ttl = '', $priority = '') {
-			$name = idn_to_ascii($name);
+		function setRecord($name, $type, $data, $ttl = '', $priority = '', $comment = []) {
+			$name = do_idn_to_ascii($name);
 			$domainInfo = $this->domainInfo;
 			if ($ttl == '') { $ttl = $domainInfo[' META ']['TTL']; }
 
 			$info['Address'] = $data;
 			$info['TTL'] = $ttl;
-			if ($type == 'MX' || $type == 'SRV') {
+			if ($type == 'MX' || $type == 'SRV' || $type == 'SVCB' || $type == 'HTTPS') {
 				$info['Priority'] = $priority;
 			}
 
 			if ($type == 'MX' || $type == 'CNAME' || $type == 'PTR' || $type == 'NS') {
-				$info['Address'] = idn_to_ascii($info['Address']);
+				$info['Address'] = do_idn_to_ascii($info['Address']);
 			}
+
+			if (!empty($comment) && !is_array($comment)) { $comment = explode("\n", $comment); }
+			$info['Comment'] = $comment;
 
 			if (!isset($domainInfo[$type][$name])) { $domainInfo[$type][$name] = array(); };
 			$domainInfo[$type][$name][] = $info;
@@ -474,11 +553,19 @@
 				foreach ($bits as $bit => $names) {
 					foreach ($names as $name) {
 						if (isset($domainInfo[' META ']['TTL']) != $name['TTL']) { $ttl = $name['TTL']; } else { $ttl = ''; }
-						if ($type == 'MX' || $type == 'SRV') { $priority = $name['Priority']; } else { $priority = ''; }
+						if ($type == 'MX' || $type == 'SRV' || $type == 'SVCB' || $type == 'HTTPS') { $priority = $name['Priority']; } else { $priority = ''; }
 						$address = $name['Address'];
 
 						if ($bit !== 0 && empty($bit)) { $bit = $this->domain.'.'; }
 
+						if (isset($name['Comment']) && !empty($name['Comment'])) {
+							$lines[] = '; ' . json_encode($name['Comment']);
+							if (!is_array($name['Comment'])) { $name['Comment'] = explode("\n", $name['Comment']); }
+							foreach ($name['Comment'] as $comment) {
+								// $lines[] = '; ' . str_replace("\r", '', str_replace("\n", '\n', $comment));
+							}
+						}
+						if ($type == 'TXT') { $address = Bind::stringToTXTRecord($address); }
 						$lines[] = sprintf('%-30s %7s    IN %7s   %-6s %s', $bit, $ttl, $type, $priority, $address);
 					}
 				}
@@ -514,7 +601,7 @@
 		function saveZoneFile($savefile = '') {
 			if ($savefile == '') { $savefile = $this->file; }
 
-			$res = $this->file_put_contents_atomic($savefile, implode("\n", $this->getParsedZoneFile()));
+			$res = self::file_put_contents_atomic($savefile, implode("\n", $this->getParsedZoneFile()));
 
 			if ($res > 0) {
 				// Update the stored contents to use the version we just saved
@@ -524,7 +611,7 @@
 			return $res;
 		}
 
-		function file_put_contents_atomic($filename, $data, $flags = 0, $context = null) {
+		public static function file_put_contents_atomic($filename, $data, $flags = 0, $context = null) {
 			$tempFile = tempnam(sys_get_temp_dir(), 'ZONE');
 
 			if (file_put_contents($tempFile, $data, $flags, $context) === strlen($data)) {
@@ -535,4 +622,3 @@
 			return FALSE;
 		}
 	}
-
