@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2b69b7b0988f868542f5e6eb36e6248b",
+    "content-hash": "bbbca90603bca586ca7702c70db70e64",
     "packages": [
         {
             "name": "mydnshost/mydnshost-php-api",
-            "version": "0.5.5",
+            "version": "0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mydnshost/mydnshost-php-api.git",
-                "reference": "398e96c475fad424c574b0253d9f23bb808211d1"
+                "reference": "583c093e9c346b5ba6b570d1fe7c4594d6de7d8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mydnshost/mydnshost-php-api/zipball/398e96c475fad424c574b0253d9f23bb808211d1",
-                "reference": "398e96c475fad424c574b0253d9f23bb808211d1",
+                "url": "https://api.github.com/repos/mydnshost/mydnshost-php-api/zipball/583c093e9c346b5ba6b570d1fe7c4594d6de7d8d",
+                "reference": "583c093e9c346b5ba6b570d1fe7c4594d6de7d8d",
                 "shasum": ""
             },
             "require": {
@@ -45,9 +45,9 @@
             "homepage": "https://github.com/mydnshost/mydnshost-php-api",
             "support": {
                 "issues": "https://github.com/mydnshost/mydnshost-php-api/issues",
-                "source": "https://github.com/mydnshost/mydnshost-php-api/tree/0.5.5"
+                "source": "https://github.com/mydnshost/mydnshost-php-api/tree/0.6"
             },
-            "time": "2022-11-22T07:13:36+00:00"
+            "time": "2025-05-09T13:16:09+00:00"
         },
         {
             "name": "rmccue/requests",

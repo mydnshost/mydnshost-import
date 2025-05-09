@@ -8,6 +8,7 @@
 
 	$api->setAuthUserKey($config['user'], $config['apikey']);
 	$api->domainAdmin($config['isAdmin']);
+	$api->setRequestTimeout(60);
 
 	$domains = $api->getDomains();
 	$errors = [];
@@ -42,7 +43,7 @@
 						// Check if domain has $wantedOwner as an owner, if not, abort.
 						$wantedOwnerLevel = $domains[$domain]['users'][$wantedOwner] ?? 'none';
 						if ($wantedOwnerLevel != 'owner') {
-							echo 'Domain exists with wrong owner: ', $domain, ' wanted: ', $wantedOwner, ' - Skipping!', "\n";
+							echo 'Domain exists but ', $wantedOwner, ' is not an owner: ', $domain, ' - Skipping!', "\n";
 							continue;
 						}
 					}
