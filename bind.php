@@ -424,7 +424,7 @@
 		 * @param $comment (optional) Comment to put above this record
 		 */
 		function setRecord($name, $type, $data, $ttl = '', $priority = '', $comment = []) {
-			$name = do_idn_to_ascii($name);
+			$name = ((empty($name) && $name !== '0' && $name !== 0) || $name === '@') ? '' : do_idn_to_ascii($name);
 			$domainInfo = $this->domainInfo;
 			if ($ttl == '') { $ttl = $domainInfo[' META ']['TTL']; }
 
@@ -521,11 +521,13 @@
 			$lines[] = '; Written at '.date('r');
 			$lines[] = '; Zone Hash: '.$this->getZoneHash();
 
+			$defaultTTL = 86400;
+
 			// TTL and ORIGIN First
 			if (isset($domainInfo[' META ']['TTL'])) {
 				$lines[] = '$TTL ' . $domainInfo[' META ']['TTL'];
 			} else {
-				$lines[] = '$TTL 86400';
+				$lines[] = '$TTL ' . $defaultTTL;
 			}
 			$lines[] = '$ORIGIN '.$this->domain.'.';
 			// Now SOA
@@ -552,17 +554,19 @@
 
 				foreach ($bits as $bit => $names) {
 					foreach ($names as $name) {
-						if (isset($domainInfo[' META ']['TTL']) != $name['TTL']) { $ttl = $name['TTL']; } else { $ttl = ''; }
+						if (($domainInfo[' META ']['TTL'] ?? $defaultTTL) != $name['TTL']) { $ttl = $name['TTL']; } else { $ttl = ''; }
 						if ($type == 'MX' || $type == 'SRV' || $type == 'SVCB' || $type == 'HTTPS') { $priority = $name['Priority']; } else { $priority = ''; }
 						$address = $name['Address'];
 
 						if ($bit !== 0 && empty($bit)) { $bit = $this->domain.'.'; }
 
 						if (isset($name['Comment']) && !empty($name['Comment'])) {
-							$lines[] = '; ' . json_encode($name['Comment']);
 							if (!is_array($name['Comment'])) { $name['Comment'] = explode("\n", $name['Comment']); }
 							foreach ($name['Comment'] as $comment) {
-								// $lines[] = '; ' . str_replace("\r", '', str_replace("\n", '\n', $comment));
+								$commentStr = trim(str_replace("\r", '', str_replace("\n", '\n', $comment)));
+								if (!empty($commentStr)) {
+									$lines[] = '; ' . $commentStr;
+								}
 							}
 						}
 						if ($type == 'TXT') { $address = Bind::stringToTXTRecord($address); }
@@ -576,7 +580,7 @@
 
 			if ($this->debugging) {
 				foreach ($lines as $line) {
-					$this->debug('parseZoneFile', $line);
+					$this->debug('getParsedZoneFile', $line);
 				}
 			}
 
