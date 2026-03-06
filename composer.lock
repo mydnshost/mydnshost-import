@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bbbca90603bca586ca7702c70db70e64",
+    "content-hash": "2bc8830cb1a3c084d90ee78c59588c0e",
     "packages": [
         {
             "name": "mydnshost/mydnshost-php-api",
-            "version": "0.6",
+            "version": "0.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mydnshost/mydnshost-php-api.git",
-                "reference": "583c093e9c346b5ba6b570d1fe7c4594d6de7d8d"
+                "reference": "9726d2961822af43a624159bd028a06a4f6e8253"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mydnshost/mydnshost-php-api/zipball/583c093e9c346b5ba6b570d1fe7c4594d6de7d8d",
-                "reference": "583c093e9c346b5ba6b570d1fe7c4594d6de7d8d",
+                "url": "https://api.github.com/repos/mydnshost/mydnshost-php-api/zipball/9726d2961822af43a624159bd028a06a4f6e8253",
+                "reference": "9726d2961822af43a624159bd028a06a4f6e8253",
                 "shasum": ""
             },
             "require": {
@@ -45,22 +45,22 @@
             "homepage": "https://github.com/mydnshost/mydnshost-php-api",
             "support": {
                 "issues": "https://github.com/mydnshost/mydnshost-php-api/issues",
-                "source": "https://github.com/mydnshost/mydnshost-php-api/tree/0.6"
+                "source": "https://github.com/mydnshost/mydnshost-php-api/tree/0.6.1"
             },
-            "time": "2025-05-09T13:16:09+00:00"
+            "time": "2026-03-06T01:55:22+00:00"
         },
         {
             "name": "rmccue/requests",
-            "version": "v2.0.15",
+            "version": "v2.0.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress/Requests.git",
-                "reference": "877cd66169755899682f1595e057334b40d9d149"
+                "reference": "74d1648cc34e16a42ea25d548fc73ec107a90421"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress/Requests/zipball/877cd66169755899682f1595e057334b40d9d149",
-                "reference": "877cd66169755899682f1595e057334b40d9d149",
+                "url": "https://api.github.com/repos/WordPress/Requests/zipball/74d1648cc34e16a42ea25d548fc73ec107a90421",
+                "reference": "74d1648cc34e16a42ea25d548fc73ec107a90421",
                 "shasum": ""
             },
             "require": {
@@ -68,15 +68,14 @@
                 "php": ">=5.6"
             },
             "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.7 || ^1.0",
                 "php-parallel-lint/php-console-highlighter": "^0.5.0",
                 "php-parallel-lint/php-parallel-lint": "^1.3.1",
-                "phpcompatibility/php-compatibility": "^9.0",
+                "phpcompatibility/php-compatibility": "^10.0.0@dev",
                 "requests/test-server": "dev-main",
-                "roave/security-advisories": "dev-latest",
                 "squizlabs/php_codesniffer": "^3.6",
                 "wp-coding-standards/wpcs": "^2.0",
-                "yoast/phpunit-polyfills": "^1.0.0"
+                "yoast/phpunit-polyfills": "^1.1.5"
             },
             "suggest": {
                 "art4/requests-psr18-adapter": "For using Requests as a PSR-18 HTTP Client",
@@ -134,16 +133,16 @@
                 "issues": "https://github.com/WordPress/Requests/issues",
                 "source": "https://github.com/WordPress/Requests"
             },
-            "time": "2025-01-21T10:13:31+00:00"
+            "time": "2025-12-12T17:47:19+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }
